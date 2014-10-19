@@ -17,20 +17,21 @@ class RopeTest extends GroovyTestCase {
     }
 
     void testGetAt() {
-        for (int i = 0; i < testRope.size(); i++) {
-            assertEquals(testRope[i], testString[i])
+        testString.eachWithIndex { character, i ->
+            assertEquals(testRope[i], character)
         }
     }
 
-    void testAppend() {
+    void testConcenate() {
+        def rope1 = new Rope("The quick brown f")
+        def rope2 = new Rope("ox jumps over the lazy dog")
+        def concatenateRope = rope1 + rope2
 
-    }
-
-    void testInsert() {
-
+        assertEquals(concatenateRope.toString(), testRope.toString())
     }
 
     void testGenerateString() {
-        assertEquals(testRope.toString(), testString)
+        def output = testRope.toString()
+        assertEquals(output, testString)
     }
 }

@@ -2,7 +2,6 @@
  * Created by Brian on 9/22/2014.
  */
 
-//TODO: Create a table of all characters in the left subtree
 //TODO: Extend iterate (for characters)
 
 class Rope {
@@ -42,12 +41,42 @@ class Rope {
         }
     }
 
-    def append(def character) {
-
+    def plus(def rope2) {
+        return concatenate(this, rope2)
     }
 
-    def insert(def index, def string) {
+    def concatenate(def rope1, def rope2) {
+        def newNode = new RopeNode()
+        newNode.leftChild = rope1.root.leftChild
+        newNode.rightChild = rope2.root.leftChild
 
+        def newRope = new Rope()
+        def newRopeRoot = new RopeNode()
+        newRopeRoot.leftChild = newNode
+        newRope.root = newRopeRoot
+        newRope.root.updateWeight()
+
+        // Need to string the right leaf of rope1 to the left leaf of rope2 to get toString to be faster
+        def rope1Node = newRope.root.leftChild.leftChild
+        def rope2Node = newRope.root.leftChild.rightChild
+
+        while (rope1Node.leftChild || rope1Node.rightChild || rope2Node.leftChild || rope2Node.rightChild) {
+            if (rope1Node.rightChild) {
+                rope1Node = rope1Node.rightChild
+            } else if (rope1Node.leftChild) {
+                rope1Node = rope1Node.leftChild
+            }
+
+            if (rope2Node.leftChild) {
+                rope2Node = rope2Node.leftChild
+            } else if (rope2Node.rightChild) {
+                rope2Node = rope2Node.rightChild
+            }
+        }
+
+        rope1Node.next = rope2Node
+
+        return newRope
     }
 
     private def splitString(def inputString) {
@@ -82,11 +111,12 @@ class Rope {
         }
 
         // String together the nodes to make string formation quicker
+        // Starts at 1 so it links 0 -> 1, ...
         for (i in 1..nodeList.size()) {
             nodeList[i-1].next = nodeList[i]
         }
 
-        // Delete the substrings incase the string is grossly large, prevents memory hits since it's already in the node form
+        // Delete the substrings in case the string is grossly large, prevents memory hits since it's already in the node form
         substrings.clear()
 
         // Pair up and reduce the nodes until we're left with 1
@@ -123,7 +153,7 @@ class Rope {
         root.updateWeight()
     }
 
-    def generateString() {
+    private def generateString() {
         def currentNode = root
         def stringOutput = new StringBuffer()
 
@@ -185,11 +215,11 @@ class RopeNode {
     def computeSubtree() {
         // Check to see if we have children, and request their subtrees
         if (leftChild && rightChild) {
-            return leftChild.computeSubtree() + rightChild.computeSubtree() + weight
+            return leftChild.computeSubtree() + rightChild.computeSubtree()
         } else if (leftChild && !rightChild) {
-            return leftChild.computeSubtree() + weight
+            return leftChild.computeSubtree()
         } else if (!leftChild && rightChild) {
-            return rightChild.computeSubtree() + weight
+            return rightChild.computeSubtree()
         } else {
             return weight
         }
