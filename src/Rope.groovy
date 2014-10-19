@@ -3,8 +3,7 @@
  */
 
 //TODO: Create a table of all characters in the left subtree
-//TODO: Make it generic and push to Github
-//TODO: Extend iterable (for characters)
+//TODO: Extend iterate (for characters)
 
 class Rope {
     private def root
@@ -19,8 +18,28 @@ class Rope {
     }
 
     Rope(def inputString, def inputSplitLength) {
-        this.splitLength = inputSplitLength
+        splitLength = inputSplitLength
         generateRope(inputString)
+    }
+
+    def size() {
+        return root.weight
+    }
+
+    def getAt(def input) {
+        return index(root, input)
+    }
+
+    def index(def node, def currentWeight) {
+        if (node.weight <= currentWeight) {
+            return index(node.rightChild, currentWeight - node.weight)
+        } else {
+            if (node.leftChild) {
+                return index(node.leftChild, currentWeight)
+            } else {
+                return node.string[currentWeight]
+            }
+        }
     }
 
     def append(def character) {
@@ -67,7 +86,7 @@ class Rope {
             nodeList[i-1].next = nodeList[i]
         }
 
-        // Preemptively delete the substrings incase the string is grossly large, prevents memory hits since it's already in the node form
+        // Delete the substrings incase the string is grossly large, prevents memory hits since it's already in the node form
         substrings.clear()
 
         // Pair up and reduce the nodes until we're left with 1
@@ -80,14 +99,14 @@ class Rope {
 
                 if (nodeList[0]) {
                     newNode.leftChild = nodeList[0]
-                    nodeList[0].parent = newNode
-                    nodeList.remove(0)
+                    nodeList.remove(nodeList.first())
+                    newNode.leftChild.parent = newNode;
                 }
 
                 if (nodeList[0]) {
                     newNode.rightChild = nodeList[0]
-                    nodeList[0].parent = newNode
-                    nodeList.remove(0)
+                    nodeList.remove(nodeList.first())
+                    newNode.rightChild.parent = newNode;
                 }
 
                 newNodeList.add(newNode)
@@ -97,11 +116,11 @@ class Rope {
         }
 
         // Add in the root node and append our tree to the left
-        this.root = new RopeNode()
-        this.root.leftChild = nodeList[0]
+        root = new RopeNode()
+        root.leftChild = nodeList[0]
 
         // With the tree finalized, update the weights
-        this.root.updateWeight()
+        root.updateWeight()
     }
 
     def generateString() {
@@ -125,7 +144,7 @@ class Rope {
 
     @Override
     public String toString() {
-        return this.generateString();
+        return generateString()
     }
 }
 
@@ -142,37 +161,37 @@ class RopeNode {
     }
 
     RopeNode(def inputString) {
-        this.string = inputString
-        this.weight = inputString.size()
+        string = inputString
+        weight = inputString.size()
     }
 
     def updateWeight() {
         // If we're a leaf, get our weight and return this
-        if (this.string) {
-            this.weight = this.string.size()
-            return this.weight;
-        } else { // We're a concat node, so we add up our left subtree
-            this.weight = this.leftChild.computeSubtree()
-            if (this.leftChild) {
-                this.leftChild.updateWeight();
+        if (string) {
+            weight = string.size()
+            return weight;
+        } else { // We're a non-leaf node, so we add up our left subtree
+            weight = leftChild.computeSubtree()
+            if (leftChild) {
+                leftChild.updateWeight();
             }
 
-            if (this.rightChild) {
-                this.rightChild.updateWeight();
+            if (rightChild) {
+                rightChild.updateWeight();
             }
-       }
+        }
     }
 
     def computeSubtree() {
         // Check to see if we have children, and request their subtrees
-        if (this.leftChild && this.rightChild) {
-            return this.leftChild.computeSubtree() + this.rightChild.computeSubtree() + this.weight
-        } else if (this.leftChild && !this.rightChild) {
-            return this.leftChild.computeSubtree() + this.weight
-        } else if (!this.leftChild && this.rightChild) {
-            return this.rightChild.computeSubtree() + this.weight
+        if (leftChild && rightChild) {
+            return leftChild.computeSubtree() + rightChild.computeSubtree() + weight
+        } else if (leftChild && !rightChild) {
+            return leftChild.computeSubtree() + weight
+        } else if (!leftChild && rightChild) {
+            return rightChild.computeSubtree() + weight
         } else {
-            return this.weight
+            return weight
         }
     }
 }
