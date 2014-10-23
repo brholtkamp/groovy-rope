@@ -30,6 +30,16 @@ class RopeTest extends GroovyTestCase {
         assertEquals(concatenateRope.toString(), testRope.toString())
     }
 
+    void testRopeEquals() {
+        def rope2 = new Rope(testString)
+
+        assertTrue(testRope == rope2)
+    }
+
+    void testStringEquals() {
+        assertTrue(testRope.toString() == testString)
+    }
+
     void testGenerateString() {
         def output = testRope.toString()
         assertEquals(output, testString)

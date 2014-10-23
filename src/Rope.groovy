@@ -8,6 +8,7 @@ class Rope {
     private def root
     private def splitLength = 5
 
+    // Constructors
     Rope() {
         root = null
     }
@@ -21,42 +22,93 @@ class Rope {
         generateRope(inputString)
     }
 
-    def size() {
-        return root.weight
-    }
-
+    // Operator overloads
     def getAt(def input) {
-        return index(root, input)
-    }
-
-    def index(def node, def currentWeight) {
-        if (node.weight <= currentWeight) {
-            return index(node.rightChild, currentWeight - node.weight)
-        } else {
-            if (node.leftChild) {
-                return index(node.leftChild, currentWeight)
-            } else {
-                return node.string[currentWeight]
-            }
-        }
+        return characterIndexOf(root, input)
     }
 
     def plus(def rope2) {
         return concatenate(this, rope2)
     }
 
-    def concatenate(def rope1, def rope2) {
+    @Override
+    boolean equals(def rope2) {
+        return (this.toString() == rope2.toString())
+    }
+
+    boolean equals(String input) {
+        return (this.toString() == input)
+    }
+
+    // Public Methods
+    def size() {
+        return root.weight
+    }
+
+    @Override
+    public String toString() {
+        return generateString()
+    }
+
+    def split(def index, def input) {
+        
+    }
+
+    def insert(def index, def input) {
+        
+    }
+    
+    def delete(def startingIndex, def endingIndex) {
+        
+    }
+
+    def report(def startingIndex, def endingIndex) {
+
+    }
+
+    // Private Methods
+
+    private def characterIndexOf(def node, def currentWeight) {
+        if (node.weight <= currentWeight) {
+            return characterIndexOf(node.rightChild, currentWeight - node.weight)
+        } else {
+            if (node.leftChild) {
+                return characterIndexOf(node.leftChild, currentWeight)
+            } else {
+                return node.string[currentWeight]
+            }
+        }
+    }
+
+    private def nodeIndexOf(def node, def currentWeight) {
+        if (node.weight <= currentWeight) {
+            return nodeIndexOf(node.rightChild, currentWeight - node.weight)
+        } else {
+            if (node.leftChild) {
+                return nodeIndexOf(node.leftChild, currentWeight)
+            } else {
+                return node
+            }
+        }
+    }
+
+    private static def concatenate(def rope1, def rope2) {
         def newNode = new RopeNode()
+
+        // Combine the nodes to the left of the root of both ropes to concatenate
         newNode.leftChild = rope1.root.leftChild
         newNode.rightChild = rope2.root.leftChild
 
+        // Create a new rope and hook in the concatenated node to the root
         def newRope = new Rope()
         def newRopeRoot = new RopeNode()
         newRopeRoot.leftChild = newNode
         newRope.root = newRopeRoot
+
+        // Update the weights for this new rope
         newRope.root.updateWeight()
 
-        // Need to string the right leaf of rope1 to the left leaf of rope2 to get toString to be faster
+        // String together the right leaf of rope1 to the left leaf of rope2 to get toString to be faster
         def rope1Node = newRope.root.leftChild.leftChild
         def rope2Node = newRope.root.leftChild.rightChild
 
@@ -130,13 +182,11 @@ class Rope {
                 if (nodeList[0]) {
                     newNode.leftChild = nodeList[0]
                     nodeList.remove(nodeList.first())
-                    newNode.leftChild.parent = newNode;
                 }
 
                 if (nodeList[0]) {
                     newNode.rightChild = nodeList[0]
                     nodeList.remove(nodeList.first())
-                    newNode.rightChild.parent = newNode;
                 }
 
                 newNodeList.add(newNode)
@@ -170,12 +220,6 @@ class Rope {
 
         return stringOutput.toString()
     }
-
-
-    @Override
-    public String toString() {
-        return generateString()
-    }
 }
 
 class RopeNode {
@@ -183,7 +227,6 @@ class RopeNode {
     def weight
     def leftChild
     def rightChild
-    def parent
     def next
 
     RopeNode() {
