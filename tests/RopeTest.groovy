@@ -12,36 +12,40 @@ class RopeTest extends GroovyTestCase {
         testString = "The quick brown fox jumps over the lazy dog"
     }
 
-    void testSize() {
-        assertEquals(testRope.size(), testString.size())
+    void testLength() {
+        assert testRope.length() == testString.length()
     }
 
     void testGetAt() {
         testString.eachWithIndex { character, i ->
-            assertEquals(testRope[i], character)
+            assert testRope[i] == character
         }
     }
 
-    void testConcenate() {
+    void testConcatenate() {
         def rope1 = new Rope("The quick brown f")
         def rope2 = new Rope("ox jumps over the lazy dog")
         def concatenateRope = rope1 + rope2
 
-        assertEquals(concatenateRope.toString(), testRope.toString())
+        assert concatenateRope.toString() == testRope.toString()
     }
 
     void testRopeEquals() {
         def rope2 = new Rope(testString)
 
-        assertTrue(testRope == rope2)
+        assert testRope == rope2
     }
 
     void testStringEquals() {
-        assertTrue(testRope.toString() == testString)
+        assert testRope.toString() == testString
     }
 
     void testGenerateString() {
         def output = testRope.toString()
-        assertEquals(output, testString)
+        assert output == testString
+    }
+
+    def blah() {
+        def foo = new Rope("Foo", 5, true)
     }
 }

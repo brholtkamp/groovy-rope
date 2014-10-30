@@ -6,18 +6,16 @@
 
 class Rope {
     private def root
-    private def splitLength = 5
+    private def splitLength
+    private def destructiveConcat
 
-    // Constructors
-    Rope() {
-        root = null
-    }
-
-    Rope(def inputString) {
-        generateRope(inputString)
-    }
-
-    Rope(def inputString, def inputSplitLength) {
+    /**
+     * Default constructor for a rope.
+     * @param inputString Initial value of the rope
+     * @param inputSplitLength Length of substrings within the rope
+     * @param destructiveConcat Create new ropes upon concatenation if true, append to existing rope if false
+     */
+    Rope(def inputString = null, def inputSplitLength = 5, destructiveConcat = false) {
         splitLength = inputSplitLength
         generateRope(inputString)
     }
@@ -41,17 +39,22 @@ class Rope {
     }
 
     // Public Methods
-    def size() {
+    def length() {
         return root.weight
     }
 
     @Override
-    public String toString() {
+    String toString() {
         return generateString()
     }
 
     def split(def index, def input) {
-        
+        def newRope = new Rope()
+
+        def splitNode = nodeIndexOf(root, input)
+
+
+
     }
 
     def insert(def index, def input) {
@@ -92,6 +95,8 @@ class Rope {
         }
     }
 
+
+    //Todo:
     private static def concatenate(def rope1, def rope2) {
         def newNode = new RopeNode()
 
