@@ -49,8 +49,17 @@ class RopeTest extends GroovyTestCase {
         // - 1 since it splits on index starting at 0
         def output = Rope.split(testRope, firstString.length() - 1)
 
-        assert firstString == output.first().toString()
-        assert secondString == output.last().toString()
+        assert output.first() == firstString
+        assert output.last() == secondString
+    }
+
+    void testInsert() {
+        def insertString = "foo "
+        def finalString = "The quick brown foo jumps over the lazy dog"
+        def initialString = "The quick brown jumps over the lazy dog"
+        def initialRope = new Rope(initialString)
+
+        assert initialRope.insert(15, insertString) == finalString
     }
 
     void testRopeEquals() {

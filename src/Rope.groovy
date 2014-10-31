@@ -141,7 +141,11 @@ class Rope {
     }
 
     def insert(def index, def input) {
-        
+        def insertRope = new Rope(input)
+
+        def splitRopes = Rope.split(this, index)
+
+        return splitRopes.first() + insertRope + splitRopes.last()
     }
     
     def delete(def startingIndex, def endingIndex) {
