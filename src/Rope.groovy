@@ -3,6 +3,7 @@
  */
 
 //TODO: Extend iterate (for characters)
+//TODO: Input verification for methods
 
 class Rope {
     private def root
@@ -25,7 +26,7 @@ class Rope {
 
     // Operator overloads
     def getAt(def input) {
-        return characterIndexOf(root, input)
+        return characterAtIndexOf(root, input)
     }
 
     def plus(def rope2) {
@@ -65,7 +66,8 @@ class Rope {
 
         // Determine where the splitting should occur
         def splitNode = nodeIndexOf(inputRope.root, splitLocation)
-        def splittingCharacter = characterIndexOf(inputRope.root, splitLocation)
+        def splittingCharacter = characterAtIndexOf(inputRope.root, splitLocation)
+        def splittingIndex = indexOfCharacterOf(inputRope.root, splitLocation)
 
         // Iterate through to the leftmost leaf
         def currentNode = inputRope.root
@@ -80,29 +82,36 @@ class Rope {
         }
 
         // Unlink the two lists of nodes
-        currentNode.previous.next = null
-        currentNode.next.previous = null
+        if (currentNode.previous) {
+            if (currentNode.previous.next) {
+                currentNode.previous.next = null
+            }
+        }
+        if (currentNode.next) {
+            if (currentNode.next.previous) {
+                currentNode.next.previous = null
+            }
+        }
 
         // Determine if we should do a node split or not
-        if (splittingCharacter == splitNode.string[splitNode.string.size() - 1]) {
-            // No split needed
+        if (splittingIndex == splitNode.string.length() - 1) {
+            // No node split necessary
             firstRopeNodes.add(currentNode)
             currentNode = splitNode.next
         } else {
-            // Have to split a node into 2 separate strings
+            // Node split necessary
             def buffer = new StringBuffer()
             def firstRopeSubstring
             def secondRopeSubstring
 
-            // Find the character to split on, give the split character to the left split
-            for (i in 0..currentNode.string.size() - 1) {
-                if (currentNode.string[i] == splittingCharacter) {
-                    buffer.append(currentNode.string[i])
-                    firstRopeSubstring = buffer.toString()
-                    buffer.setLength(0)
-                } else {
-                    buffer.append(currentNode.string[i])
-                }
+            for (i in 0..splittingIndex) {
+                buffer.append(splitNode.string[i])
+            }
+            firstRopeSubstring = buffer.toString()
+            buffer.setLength(0)
+
+            for (i in splittingIndex + 1..splitNode.string.length() - 1) {
+                buffer.append(splitNode.string[i])
             }
             secondRopeSubstring = buffer.toString()
 
@@ -134,6 +143,8 @@ class Rope {
         firstRope.root.leftChild = firstRope.combineNodes(firstRopeNodes)
         secondRope.root = new RopeNode()
         secondRope.root.leftChild = secondRope.combineNodes(secondRopeNodes)
+        firstRope.root.updateWeight()
+        secondRope.root.updateWeight()
         output.add(firstRope)
         output.add(secondRope)
 
@@ -149,22 +160,67 @@ class Rope {
     }
     
     def delete(def startingIndex, def endingIndex) {
-        
+        def firstSplit = Rope.split(this, startingIndex)
+        def secondSplit = Rope.split(firstSplit.last(), endingIndex - startingIndex)
+
+        return firstSplit.first() + secondSplit.last()
     }
 
     def report(def startingIndex, def endingIndex) {
+        def startingNode = nodeIndexOf(root, startingIndex)
+        def endingNode = nodeIndexOf(root, endingIndex)
+        def startingCharacterIndex = indexOfCharacterOf(root, startingIndex)
+        def endingCharacterIndex = indexOfCharacterOf(root, endingIndex)
 
+        def buffer = new StringBuffer()
+        def currentNode = startingNode
+
+        if (startingNode != endingNode) {
+            // Get the characters from the startingNode
+            for (i in startingCharacterIndex..currentNode.string.length() - 1) {
+                buffer.append(currentNode.string[i])
+            }
+            currentNode = currentNode.next
+
+            // Get the nodes inbetween
+            while (currentNode != endingNode) {
+                buffer.append(currentNode.string)
+                currentNode = currentNode.next
+            }
+
+            for (i in 0..endingCharacterIndex) {
+                buffer.append(currentNode.string[i])
+            }
+        } else {
+            for (i in startingCharacterIndex..endingCharacterIndex) {
+                buffer.append(currentNode.string[i])
+            }
+        }
+
+        return buffer.toString()
     }
 
     // Private Methods
-    private static def characterIndexOf(def node, def currentWeight) {
+    private static def characterAtIndexOf(def node, def currentWeight) {
         if (node.weight <= currentWeight) {
-            return characterIndexOf(node.rightChild, currentWeight - node.weight)
+            return characterAtIndexOf(node.rightChild, currentWeight - node.weight)
         } else {
             if (node.leftChild) {
-                return characterIndexOf(node.leftChild, currentWeight)
+                return characterAtIndexOf(node.leftChild, currentWeight)
             } else {
                 return node.string[currentWeight]
+            }
+        }
+    }
+
+    private static def indexOfCharacterOf(def node, def currentWeight) {
+        if (node.weight <= currentWeight) {
+            return indexOfCharacterOf(node.leftChild, currentWeight - node.weight)
+        } else {
+            if (node.leftChild) {
+                return indexOfCharacterOf(node.leftChild, currentWeight)
+            } else {
+                return currentWeight
             }
         }
     }
@@ -180,7 +236,6 @@ class Rope {
             }
         }
     }
-
 
     private def concatenate(def rope1, def rope2) {
         def newNode = new RopeNode()

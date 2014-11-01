@@ -58,8 +58,25 @@ class RopeTest extends GroovyTestCase {
         def finalString = "The quick brown foo jumps over the lazy dog"
         def initialString = "The quick brown jumps over the lazy dog"
         def initialRope = new Rope(initialString)
+        def initialRopeAddress = initialRope
 
         assert initialRope.insert(15, insertString) == finalString
+        assert initialRope.is(initialRopeAddress) // Check for object destruction
+    }
+
+    void testDelete() {
+        def initialString = "The quick brown ffffox jumps over the lazy dog"
+        def initialRope = new Rope(initialString)
+        def initialRopeAddress = initialRope
+        initialRope.delete(16, 18)
+
+        assert initialRope == testString
+        assert initialRope.is(initialRopeAddress) // Check for object destruction
+    }
+
+    void testReport() {
+        assert testRope.report(16, 18) == 'fox'
+        assert testRope.report(1, 41) == 'he quick brown fox jumps over the lazy do'
     }
 
     void testRopeEquals() {
@@ -74,10 +91,7 @@ class RopeTest extends GroovyTestCase {
 
     void testGenerateString() {
         def output = testRope.toString()
+        
         assert output == testString
-    }
-
-    def blah() {
-        def foo = new Rope("Foo", 5, true)
     }
 }
