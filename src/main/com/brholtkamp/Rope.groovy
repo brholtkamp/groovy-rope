@@ -4,6 +4,7 @@
 
 //TODO: Extend iterate (for characters)
 //TODO: Input verification for methods
+//TODO: Finish documentation
 
 class Rope {
     private def root
@@ -154,14 +155,14 @@ class Rope {
     def insert(def index, def input) {
         def insertRope = new Rope(input)
 
-        def splitRopes = Rope.split(this, index)
+        def splitRopes = split(this, index)
 
         return splitRopes.first() + insertRope + splitRopes.last()
     }
     
     def delete(def startingIndex, def endingIndex) {
-        def firstSplit = Rope.split(this, startingIndex)
-        def secondSplit = Rope.split(firstSplit.last(), endingIndex - startingIndex)
+        def firstSplit = split(this, startingIndex)
+        def secondSplit = split(firstSplit.last(), endingIndex - startingIndex)
 
         return firstSplit.first() + secondSplit.last()
     }
