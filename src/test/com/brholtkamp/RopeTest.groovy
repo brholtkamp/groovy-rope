@@ -1,3 +1,5 @@
+package com.brholtkamp
+
 /**
  * Created by Brian on 10/18/2014.
  */
@@ -51,6 +53,7 @@ class RopeTest extends GroovyTestCase {
 
         assert output.first() == firstString
         assert output.last() == secondString
+        assert testRope == testString
     }
 
     void testInsert() {
