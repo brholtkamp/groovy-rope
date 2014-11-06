@@ -14,6 +14,16 @@ class RopeTest extends GroovyTestCase {
         testString = "The quick brown fox jumps over the lazy dog"
     }
 
+    void testConstructor() {
+        assert null != new Rope(testString, -1, true)
+    }
+
+    void testCopyConstructor() {
+        def copyRope = new Rope(testRope)
+
+        assert copyRope == testRope
+    }
+
     void testLength() {
         assert testRope.length() == testString.length()
     }
@@ -22,6 +32,8 @@ class RopeTest extends GroovyTestCase {
         testString.eachWithIndex { character, i ->
             assert testRope[i] == character
         }
+
+        assert null == testRope[-1]
     }
 
     void testDestructiveConcatenate() {
@@ -42,6 +54,14 @@ class RopeTest extends GroovyTestCase {
 
         assert originalRope1.is(rope1)
         assert rope1.toString() == testString
+        assert null == (rope1 + new Rope(""))
+
+        rope1 += testRope
+        def rope3 = new Rope(testString, 20)
+        def rope4 = new Rope(testString, 20)
+        rope3 += rope4
+        rope1 += rope3
+        assert rope1.toString() == (testString + testString + testString + testString)
     }
 
     void testSplit() {
@@ -86,6 +106,8 @@ class RopeTest extends GroovyTestCase {
         def rope2 = new Rope(testString)
 
         assert testRope == rope2
+        rope2.root = null
+        assert !(testRope == rope2)
     }
 
     void testStringEquals() {
@@ -97,4 +119,5 @@ class RopeTest extends GroovyTestCase {
 
         assert output == testString
     }
+
 }

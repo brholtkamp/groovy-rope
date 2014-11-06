@@ -19,18 +19,28 @@ class Rope {
      * @param inputSplitLength Length of substrings within the rope, defaults to 5
      * @param destructiveConcatenate Creates a new rope upon concatenation if true, append to existing rope if false, false is default
      */
-    Rope(def inputString = null, def inputSplitLength = 5, inputDestructiveConcatenate = false) {
+    Rope(String inputString = null, int inputSplitLength = 5, boolean inputDestructiveConcatenate = false) {
         if (inputSplitLength < 0) {
             inputSplitLength = 5
         } else {
             splitLength = inputSplitLength
         }
 
-        if (inputString) {
+        if (inputString && inputString != "") {
             generateRopeFromString(inputString)
         }
 
         destructiveConcatenate = inputDestructiveConcatenate
+    }
+
+    /**
+     * Deep copy constructor
+     * @param inputRope Rope to be copied
+     */
+    Rope(Rope inputRope) {
+        splitLength = inputRope.splitLength
+        root = copyNodesFromRope(inputRope)
+        destructiveConcatenate = inputRope.destructiveConcatenate
     }
 
     // Operator overloads
@@ -46,6 +56,7 @@ class Rope {
     def plus(def rope2) {
         if (!rope2.root) {
             println 'The other is not yet initialized'
+            return null
         }
 
         return concatenate(this, rope2)
@@ -55,6 +66,7 @@ class Rope {
     boolean equals(def rope2) {
         if (!rope2.root) {
             println 'The other is not yet initialized'
+            return false
         }
 
         return this.toString() == rope2.toString()
@@ -67,7 +79,7 @@ class Rope {
     // Public Methods
     /**
      * Returns the length of the rope
-     * @return
+     * @return Length of the rope
      */
     def length() {
         return root.weight
@@ -75,7 +87,7 @@ class Rope {
 
     /**
      * Creates a string that represents the contents of the rope
-     * @return
+     * @return String representation of the rope
      */
     @Override
     String toString() {
@@ -86,7 +98,7 @@ class Rope {
      * Splits the rope into an ArrayList of 2 new ropes, does not destroy the rope passed in
      * @param inputRope The rope used to create the 2 split ropes
      * @param splitLocation Starts at index of 0
-     * @return
+     * @return An ArrayList of the 2 halves of the rope
      */
     def static split(def inputRope, def splitLocation) {
         def firstRopeNodes = []
@@ -141,6 +153,12 @@ class Rope {
         return [firstRope, secondRope]
     }
 
+    /**
+     * Inserts a string within the rope at the indicated index
+     * @param index Position within the rope to insert to
+     * @param input String to be inserted at index
+     * @return A rope with the inserted string
+     */
     def insert(def index, def input) {
         def insertRope = new Rope(input)
 
@@ -148,7 +166,13 @@ class Rope {
 
         return splitRopes.first() + insertRope + splitRopes.last()
     }
-    
+
+    /**
+     * Deletes all characters from the 2 indices
+     * @param startingIndex Beginning index
+     * @param endingIndex Ending index
+     * @return None, the original rope is changed
+     */
     def delete(def startingIndex, def endingIndex) {
         def firstSplit = split(this, startingIndex)
         def secondSplit = split(firstSplit.last(), endingIndex - startingIndex)
@@ -157,6 +181,12 @@ class Rope {
         root = result.root
     }
 
+    /**
+     * Returns a string of the substring between the 2 indices
+     * @param startingIndex Beginning index
+     * @param endingIndex Ending index
+     * @return A string containing the substring from the rope
+     */
     def report(def startingIndex, def endingIndex) {
         def startingNode = nodeIndexOf(root, startingIndex)
         def endingNode = nodeIndexOf(root, endingIndex)
@@ -191,12 +221,8 @@ class Rope {
         return buffer.toString()
     }
 
-    // Private Methods
-    private static def copyRope(def inputRope) {
-        return new Rope().generateRopeFromString(copyNodes(inputRope))
-    }
-
-    private static def copyNodes(def inputRope) {
+    // Private methods
+    private static def copyNodesFromRope(def inputRope) {
         def currentNode = inputRope.root
 
         while(currentNode.leftChild) {
@@ -206,12 +232,20 @@ class Rope {
         def newNode
         def nodeList = []
 
-        while (currentNode.next) {
-            newNode = new RopeNode(currentNode)
+        while (currentNode) {
+            newNode = new RopeNode(currentNode.string)
             nodeList.add(newNode)
+            currentNode = currentNode.next
         }
 
-        return nodeList
+        for (i in 1..nodeList.size()) {
+            nodeList[i-1].next = nodeList[i]
+            if (i != nodeList.size()) {
+                nodeList[i-1].next.previous = nodeList[i-1]
+            }
+        }
+
+        return inputRope.combineNodes(nodeList)
     }
 
     private static def characterAtIndexOf(def node, def currentWeight) {
